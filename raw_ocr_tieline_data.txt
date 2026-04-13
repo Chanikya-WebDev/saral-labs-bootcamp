@@ -1,0 +1,41 @@
+Raw OCR output:
+PJTiny tia
+PN a a ese e- 1B Y(ele]
+need (Vaswani et.al).
+
+Birth of attention
+INT Te antl lay
+translation by jointly
+learning to align and
+translate
+
+Just ask
+Language models are
+few shot learners
+(Brown et.al.)
+
+Generalize
+Improving language
+understanding by
+Generative pre-training
+(Radford et.al)
+
+ 
+
+PBL
+Bcc a Claret) =)
+models to follow
+instructions.
+
+Use tools
+Toolformer: Language
+Models can teach
+themselves to use tools
+(Schick, Yu)
+
+BTor CR CRT Tiler)
+Ke) Tae eatLtLe
+Adaptation of Large
+Language Models (Hu,
+Shen, et.al.)
+

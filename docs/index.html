@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT Research Timeline — Saral Labs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128; --surface3: #21262d;
+      --border: rgba(255,255,255,0.08); --divider: rgba(255,255,255,0.05);
+      --text: #e6edf3; --muted: #8b949e; --faint: #484f58;
+      --blue: #58a6ff; --emerald: #3fb950; --purple: #a371f7; --orange: #ffa657;
+      --font-d: 'Space Grotesk', sans-serif; --font-b: 'Inter', sans-serif; --font-m: 'JetBrains Mono', monospace;
+      --r-sm: 0.375rem; --r-md: 0.5rem; --r-lg: 0.75rem; --r-xl: 1rem; --r-2xl: 1.5rem;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 1rem; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+
+    /* ── NAVBAR ─────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(1rem, 4vw, 2.5rem);
+      height: 60px;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.625rem; font-family: var(--font-d); font-weight: 700; font-size: 1.05rem; }
+    .nav-logo svg { flex-shrink: 0; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.75rem; border-radius: var(--r-md);
+      font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em;
+      color: var(--muted); transition: color 180ms var(--ease), background 180ms var(--ease);
+    }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: var(--blue); background: rgba(88,166,255,0.1); }
+    .nav-link .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .search-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.375rem 0.875rem; border-radius: var(--r-md);
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: 0.8125rem; color: var(--muted);
+      transition: border-color 180ms var(--ease), color 180ms var(--ease);
+    }
+    .search-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .kbd { padding: 0.1rem 0.35rem; border-radius: 4px; background: var(--surface3); border: 1px solid var(--border); font-family: var(--font-m); font-size: 0.7rem; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; padding: 0.5rem; }
+    .hamburger span { display: block; width: 20px; height: 2px; background: var(--muted); border-radius: 2px; transition: transform 200ms, opacity 200ms; }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero {
+      padding: clamp(7rem, 12vw, 10rem) clamp(1rem, 4vw, 2.5rem) clamp(2rem, 6vw, 4rem);
+      text-align: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(88,166,255,0.12), transparent);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.375rem 1rem; border-radius: 999px;
+      background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2);
+      font-size: 0.8rem; font-weight: 600; color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-d); font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 700; line-height: 1.08; letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 .gradient { background: linear-gradient(135deg, #58a6ff, #a371f7, #3fb950); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { max-width: 52ch; margin: 0 auto 2.5rem; font-size: clamp(1rem, 1.5vw, 1.125rem); color: var(--muted); line-height: 1.7; }
+    .hero-stats { display: flex; justify-content: center; gap: clamp(1.5rem, 4vw, 3rem); flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-family: var(--font-d); font-size: 1.75rem; font-weight: 700; color: var(--text); line-height: 1; }
+    .stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── LAYOUT ──────────────────────────────────────── */
+    .main-layout {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2.5rem) 6rem;
+      display: grid; grid-template-columns: 1fr; gap: 2rem;
+    }
+    @media (min-width: 900px) { .main-layout { grid-template-columns: 3fr 2fr; align-items: start; } }
+
+    /* ── TIMELINE ────────────────────────────────────── */
+    .timeline-wrap { position: relative; }
+    .timeline-track {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, transparent, var(--blue), var(--purple), var(--emerald), transparent);
+      opacity: 0.3;
+    }
+    @media (max-width: 899px) { .timeline-track { left: 1.25rem; } }
+    .timeline-item { position: relative; display: grid; grid-template-columns: 1fr 2px 1fr; align-items: start; margin-bottom: 2.5rem; gap: 0 1.5rem; }
+    .timeline-item:nth-child(even) .t-card { grid-column: 3; grid-row: 1; }
+    .timeline-item:nth-child(even) .t-spacer { grid-column: 1; grid-row: 1; }
+    .timeline-dot-col { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; align-items: center; padding-top: 1.25rem; }
+    .timeline-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--surface); border: 2px solid var(--blue);
+      box-shadow: 0 0 12px rgba(88,166,255,0.5);
+      flex-shrink: 0; transition: transform 200ms var(--ease), box-shadow 200ms var(--ease); cursor: pointer;
+    }
+    .timeline-dot:hover, .timeline-dot.active { transform: scale(1.4); box-shadow: 0 0 20px rgba(88,166,255,0.8); }
+    .t-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease), transform 200ms var(--ease);
+    }
+    .t-card:hover { border-color: rgba(88,166,255,0.3); box-shadow: 0 4px 20px rgba(88,166,255,0.12); transform: translateY(-2px); }
+    .t-card.active { border-color: var(--blue); box-shadow: 0 4px 24px rgba(88,166,255,0.2); }
+    .t-year-tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 0.5rem; }
+    .t-title { font-family: var(--font-d); font-size: 0.9rem; font-weight: 600; line-height: 1.4; }
+    .t-tag { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+    .tag-attention { background: rgba(163,113,247,0.15); color: var(--purple); }
+    .tag-architecture { background: rgba(88,166,255,0.15); color: var(--blue); }
+    .tag-pretraining { background: rgba(255,166,87,0.15); color: var(--orange); }
+    .tag-scaling { background: rgba(63,185,80,0.15); color: var(--emerald); }
+    .tag-alignment { background: rgba(255,166,87,0.15); color: var(--orange); }
+    .tag-finetuning { background: rgba(163,113,247,0.15); color: var(--purple); }
+    .tag-tooluse { background: rgba(88,166,255,0.15); color: var(--blue); }
+    .t-spacer { pointer-events: none; }
+
+    /* Mobile timeline */
+    @media (max-width: 899px) {
+      .timeline-item { grid-template-columns: 2rem 1fr; gap: 0 1rem; }
+      .timeline-dot-col { grid-column: 1; }
+      .t-card { grid-column: 2; grid-row: 1; }
+      .timeline-item:nth-child(even) .t-card { grid-column: 2; }
+      .timeline-item:nth-child(even) .t-spacer { display: none; }
+      .t-spacer { display: none; }
+    }
+
+    /* ── DETAIL PANEL ────────────────────────────────── */
+    .detail-panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-2xl); overflow: hidden;
+      position: sticky; top: 4.5rem; transition: border-color 300ms var(--ease);
+    }
+    @media (max-width: 899px) { .detail-panel { position: static; } }
+    .panel-header {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(163,113,247,0.06));
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-placeholder { padding: 3rem 1.5rem; text-align: center; color: var(--faint); }
+    .panel-placeholder svg { margin: 0 auto 1rem; opacity: 0.3; }
+    .panel-placeholder p { font-size: 0.875rem; }
+    .panel-content { padding: 1.5rem; display: none; }
+    .panel-year-tag {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.3rem 0.8rem; border-radius: 999px;
+      background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.25);
+      font-size: 0.75rem; font-weight: 700; color: var(--blue); letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    .panel-title { font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; line-height: 1.35; margin-bottom: 1rem; }
+    .panel-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
+    .panel-meta { border-top: 1px solid var(--divider); padding-top: 1rem; }
+    .panel-meta-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--faint); font-weight: 600; margin-bottom: 0.35rem; }
+    .panel-meta-value { font-size: 0.875rem; color: var(--text); }
+    .panel-actions { display: flex; gap: 0.5rem; margin-top: 1.25rem; flex-wrap: wrap; }
+    .btn-ghost { padding: 0.45rem 1rem; border-radius: var(--r-md); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 500; color: var(--muted); transition: border-color 180ms, color 180ms, background 180ms; }
+    .btn-ghost:hover { border-color: rgba(88,166,255,0.4); color: var(--blue); background: rgba(88,166,255,0.06); }
+    .btn-primary { padding: 0.45rem 1rem; border-radius: var(--r-md); background: var(--blue); font-size: 0.8rem; font-weight: 600; color: #0d1117; transition: background 180ms; }
+    .btn-primary:hover { background: #79b8ff; }
+
+    /* ── FILTER BAR ──────────────────────────────────── */
+    .filter-bar {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2.5rem) 2rem;
+      display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+    }
+    .filter-label { font-size: 0.75rem; color: var(--muted); font-weight: 500; margin-right: 0.25rem; }
+    .filter-btn {
+      padding: 0.35rem 0.875rem; border-radius: 999px;
+      border: 1px solid var(--border); background: transparent;
+      font-size: 0.75rem; font-weight: 500; color: var(--muted);
+      transition: all 180ms var(--ease);
+    }
+    .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .filter-btn.active { background: rgba(88,166,255,0.15); border-color: rgba(88,166,255,0.35); color: var(--blue); }
+
+    /* ── SEARCH MODAL ────────────────────────────────── */
+    .search-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      display: flex; align-items: flex-start; justify-content: center;
+      padding-top: 12vh;
+      opacity: 0; pointer-events: none; transition: opacity 200ms;
+    }
+    .search-overlay.open { opacity: 1; pointer-events: all; }
+    .search-box {
+      width: min(600px, 90vw); background: var(--surface2);
+      border: 1px solid var(--border); border-radius: var(--r-xl);
+      overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transform: translateY(-16px); transition: transform 200ms var(--ease);
+    }
+    .search-overlay.open .search-box { transform: translateY(0); }
+    .search-input-wrap { display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--divider); }
+    .search-input { flex: 1; background: none; border: none; outline: none; color: var(--text); font: inherit; font-size: 1.05rem; }
+    .search-results { max-height: 320px; overflow-y: auto; }
+    .search-result-item { padding: 0.875rem 1.25rem; cursor: pointer; border-bottom: 1px solid var(--divider); transition: background 150ms; }
+    .search-result-item:hover { background: rgba(255,255,255,0.04); }
+    .search-result-item:last-child { border-bottom: none; }
+    .sri-year { font-size: 0.7rem; color: var(--blue); font-weight: 600; margin-bottom: 0.2rem; }
+    .sri-title { font-size: 0.875rem; font-weight: 500; }
+    .search-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.875rem; }
+
+    /* ── PROGRESS BAR ────────────────────────────────── */
+    #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(to right, var(--blue), var(--purple)); width: 0; z-index: 200; transition: width 0.1s; }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer { border-top: 1px solid var(--divider); padding: clamp(2rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem); text-align: center; color: var(--faint); font-size: 0.8125rem; }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--blue); }
+
+
+    /* ── QUIZ SECTION ─────────────────────────────────────── */
+    .quiz-section-wrap {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2.5rem) clamp(3rem,6vw,5rem);
+    }
+    .quiz-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      border-top: 1px solid var(--border); padding-top: 2.5rem; margin-bottom: 2rem;
+    }
+    .quiz-section-title { font-family: var(--font-d); font-size: clamp(1.2rem,2.5vw,1.6rem); font-weight: 700; display: flex; align-items: center; gap: 0.75rem; }
+    .quiz-badge { padding: 0.3rem 0.8rem; border-radius: 999px; background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.25); font-family: var(--font-m); font-size: 0.75rem; font-weight: 700; color: var(--blue); }
+    .quiz-start-btn { padding: 0.55rem 1.25rem; border-radius: var(--r-md); background: var(--blue); font-family: var(--font-d); font-size: 0.875rem; font-weight: 700; color: #0d1117; cursor: pointer; border: none; transition: background 150ms; }
+    .quiz-start-btn:hover { background: #79b8ff; }
+    .quiz-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    @media (min-width: 768px) { .quiz-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1100px) { .quiz-grid { grid-template-columns: 1fr 1fr 1fr; } }
+    .qcard {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 1.5rem;
+      transition: border-color 200ms;
+    }
+    .qcard.answered-correct { border-color: var(--emerald); }
+    .qcard.answered-wrong   { border-color: rgba(255,80,80,0.5); }
+    .qcard-num { font-family: var(--font-m); font-size: 0.7rem; font-weight: 700; color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.625rem; }
+    .qcard-year { display: inline-block; margin-bottom: 0.5rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2); font-size: 0.7rem; font-weight: 700; color: var(--blue); font-family: var(--font-m); }
+    .qcard-q { font-family: var(--font-d); font-size: 0.9rem; font-weight: 600; line-height: 1.5; margin-bottom: 1rem; color: var(--text); }
+    .qcard-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+    .qopt {
+      text-align: left; padding: 0.6rem 0.875rem; border-radius: var(--r-md);
+      background: var(--surface2); border: 1px solid var(--border);
+      font-size: 0.82rem; color: var(--muted); cursor: pointer;
+      transition: background 130ms, border-color 130ms, color 130ms;
+      display: flex; align-items: flex-start; gap: 0.6rem;
+    }
+    .qopt:hover:not([disabled]) { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.18); color: var(--text); }
+    .qopt.correct { background: rgba(63,185,80,0.1); border-color: var(--emerald); color: var(--text); }
+    .qopt.wrong   { background: rgba(255,70,70,0.08); border-color: rgba(255,70,70,0.35); }
+    .qopt-key { font-family: var(--font-m); font-size: 0.75rem; font-weight: 700; color: var(--blue); flex-shrink: 0; margin-top: 0.05rem; }
+    .qfeedback {
+      display: none; margin-top: 0.875rem; padding: 0.875rem 1rem;
+      background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15);
+      border-radius: var(--r-md); font-size: 0.82rem; color: var(--muted); line-height: 1.65;
+    }
+    .qfeedback strong { color: var(--blue); }
+    /* SCOREBOARD */
+    .scoreboard {
+      margin-top: 2.5rem; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-2xl); padding: 2rem; display: none;
+    }
+    .scoreboard.visible { display: block; }
+    .sb-title { font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    .sb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .sb-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1rem 1.25rem; }
+    .sb-stat-val { font-family: var(--font-d); font-size: 1.75rem; font-weight: 700; line-height: 1; margin-bottom: 0.35rem; }
+    .sb-stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+    .sb-bar-wrap { margin-bottom: 1.5rem; }
+    .sb-bar-track { height: 10px; background: var(--surface3); border-radius: 999px; overflow: hidden; margin-top: 0.5rem; }
+    .sb-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(to right, var(--blue), var(--emerald)); transition: width 0.8s cubic-bezier(0.16,1,0.3,1); width: 0; }
+    .sb-breakdown { display: flex; flex-direction: column; gap: 0.5rem; }
+    .sb-row { display: flex; align-items: center; gap: 0.75rem; font-size: 0.82rem; }
+    .sb-row-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+    .sb-row-icon.c { background: rgba(63,185,80,0.15); color: var(--emerald); }
+    .sb-row-icon.w { background: rgba(255,80,80,0.12); color: #ff8080; }
+    .sb-row-paper { flex: 1; color: var(--muted); }
+    .sb-restart { margin-top: 1.5rem; padding: 0.6rem 1.5rem; border-radius: var(--r-md); background: var(--surface2); border: 1px solid var(--border); font-size: 0.875rem; font-weight: 600; color: var(--text); cursor: pointer; transition: background 150ms, border-color 150ms; }
+    .sb-restart:hover { background: rgba(88,166,255,0.08); border-color: rgba(88,166,255,0.3); color: var(--blue); }
+    .verdict { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+    .verdict.pass { background: rgba(63,185,80,0.12); color: var(--emerald); border: 1px solid rgba(63,185,80,0.25); }
+    .verdict.fail { background: rgba(255,80,80,0.1); color: #ff8080; border: 1px solid rgba(255,80,80,0.25); }
+
+    /* ── ANIMATIONS ──────────────────────────────────── */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .anim { opacity: 0; animation: fadeInUp 0.5s var(--ease) forwards; }
+
+    @media (max-width: 640px) {
+      .nav-actions .search-btn span { display: none; }
+      .nav-actions .search-btn .kbd { display: none; }
+      .hamburger { display: flex; }
+      .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem; gap: 0.25rem; }
+      .nav-links.open { display: flex; }
+      .nav-link { padding: 0.625rem 0.875rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+
+  <!-- SEARCH OVERLAY -->
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-label="Search papers">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;color:var(--muted)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="search-input" id="searchInput" placeholder="Search papers, authors, concepts…" autocomplete="off">
+        <button onclick="closeSearch()" style="color:var(--muted);font-size:0.75rem;letter-spacing:0.05em">ESC</button>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-empty">Start typing to search…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Saral Labs home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect width="26" height="26" rx="6" fill="rgba(88,166,255,0.15)"/>
+        <path d="M7 13L11 17L19 9" stroke="#58a6ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Saral Labs</span>
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="document.getElementById('navLinks').classList.toggle('open');this.classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link active"><span class="dot"></span>Timeline</a>
+      <a href="easy.html" class="nav-link">Easy Guide</a>
+      <a href="hard.html" class="nav-link">Advanced Guide</a>
+    </div>
+    <div class="nav-actions">
+      <button class="search-btn" onclick="openSearch()" aria-label="Search papers (Ctrl+K)">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Search</span>
+        <kbd class="kbd">⌘K</kbd>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+      Research Timeline
+    </div>
+    <h1>The <span class="gradient">GPT Evolution</span></h1>
+    <p>A curated journey through the landmark papers that redefined Artificial Intelligence — from the first attention mechanism to modern AI agents.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">7</div><div class="stat-label">Key Papers</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-label">Years Covered</div></div>
+      <div class="stat"><div class="stat-num">2015–23</div><div class="stat-label">Era</div></div>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" role="toolbar" aria-label="Filter by tag">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Attention">Attention</button>
+    <button class="filter-btn" data-filter="Architecture">Architecture</button>
+    <button class="filter-btn" data-filter="Pre-training">Pre-training</button>
+    <button class="filter-btn" data-filter="Scaling">Scaling</button>
+    <button class="filter-btn" data-filter="Alignment">Alignment</button>
+    <button class="filter-btn" data-filter="Fine-tuning">Fine-tuning</button>
+    <button class="filter-btn" data-filter="Tool use">Tool use</button>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <main class="main-layout" role="main">
+    <div class="timeline-wrap">
+      <div class="timeline-track"></div>
+      <div id="timeline-container"></div>
+    </div>
+    <aside aria-label="Paper details">
+      <div class="detail-panel" id="detailPanel">
+        <div class="panel-header">
+          <p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:600;">Paper Details</p>
+        </div>
+        <div class="panel-placeholder" id="panelPlaceholder">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6M9 16h6M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/></svg>
+          <p>Click any paper card<br>to see its details here.</p>
+        </div>
+        <div class="panel-content" id="panelContent">
+          <div class="panel-year-tag" id="pYearTag"></div>
+          <h2 class="panel-title" id="pTitle"></h2>
+          <p class="panel-desc" id="pDesc"></p>
+          <div class="panel-meta">
+            <div class="panel-meta-label">Authors</div>
+            <div class="panel-meta-value" id="pAuthors"></div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost" id="pCopy" onclick="copyPaper()">Copy Citation</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- QUIZ SECTION -->
+  <div class="quiz-section-wrap">
+    <div class="quiz-section-header">
+      <div class="quiz-section-title">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        Timeline Quiz
+        <span class="quiz-badge">7 Questions</span>
+      </div>
+      <button class="quiz-start-btn" id="quizStartBtn" onclick="startQuiz()">Start Quiz</button>
+    </div>
+    <div class="quiz-grid" id="quizGrid" style="display:none;"></div>
+    <div class="scoreboard" id="scoreboard">
+      <div class="sb-title">
+        📊 Your Results
+        <span id="sbVerdict"></span>
+      </div>
+      <div class="sb-grid">
+        <div class="sb-stat"><div class="sb-stat-val" id="sbScore" style="color:var(--blue)">0/7</div><div class="sb-stat-label">Score</div></div>
+        <div class="sb-stat"><div class="sb-stat-val" id="sbPct" style="color:var(--emerald)">0%</div><div class="sb-stat-label">Accuracy</div></div>
+        <div class="sb-stat"><div class="sb-stat-val" id="sbTime" style="color:var(--orange)">0s</div><div class="sb-stat-label">Time Taken</div></div>
+        <div class="sb-stat"><div class="sb-stat-val" id="sbStreak" style="color:var(--purple)">0</div><div class="sb-stat-label">Best Streak</div></div>
+      </div>
+      <div class="sb-bar-wrap">
+        <div style="font-size:0.8rem;color:var(--muted);font-weight:600;">Accuracy</div>
+        <div class="sb-bar-track"><div class="sb-bar-fill" id="sbBar"></div></div>
+      </div>
+      <div class="sb-breakdown" id="sbBreakdown"></div>
+      <button class="sb-restart" onclick="restartQuiz()">↺ Restart Quiz</button>
+    </div>
+  </div>
+
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Saral Labs Bootcamp · GPT Research Timeline · Built for learners</p>
+  </footer>
+
+  <script>
+    const data = [
+      { year: 2015, title: "Neural Machine Translation by Jointly Learning to Align and Translate", authors: "Bahdanau et al.", description: "Introduced the attention mechanism that allows models to focus on relevant parts of input sequences — the foundational idea behind all modern LLMs.", tag: "Attention" },
+      { year: 2017, title: "Attention Is All You Need", authors: "Vaswani et al.", description: "Introduced the Transformer architecture, replacing recurrent models entirely with pure self-attention. Every major LLM today is built on this paper.", tag: "Architecture" },
+      { year: 2018, title: "Improving Language Understanding by Generative Pre-Training", authors: "Radford et al.", description: "GPT-1 showed that pretraining on large text corpora followed by fine-tuning achieves strong NLP benchmarks across diverse tasks.", tag: "Pre-training" },
+      { year: 2020, title: "Language Models are Few-Shot Learners", authors: "Brown et al.", description: "GPT-3 demonstrated that massive language models can perform tasks with just a few examples in the prompt — no fine-tuning required.", tag: "Scaling" },
+      { year: 2022, title: "Training Language Models to Follow Instructions with Human Feedback", authors: "Ouyang et al.", description: "InstructGPT showed that RLHF makes language models more helpful, harmless, and honest — the technique behind ChatGPT.", tag: "Alignment" },
+      { year: 2023, title: "LoRA: Low-Rank Adaptation of Large Language Models", authors: "Hu, Shen et al.", description: "LoRA enables efficient fine-tuning of LLMs by training only low-rank decomposition matrices — making fine-tuning accessible without massive compute.", tag: "Fine-tuning" },
+      { year: 2023, title: "Toolformer: Language Models Can Teach Themselves to Use Tools", authors: "Schick, Yu et al.", description: "Showed that LLMs can learn to call external APIs by self-supervising on when tool use improves predictions — foundation of modern AI agents.", tag: "Tool use" }
+    ];
+
+    const tagColors = { 'Attention':'tag-attention','Architecture':'tag-architecture','Pre-training':'tag-pretraining','Scaling':'tag-scaling','Alignment':'tag-alignment','Fine-tuning':'tag-finetuning','Tool use':'tag-tooluse' };
+
+    let currentFilter = 'all';
+    let currentPaper = null;
+
+    function renderTimeline(filter) {
+      const container = document.getElementById('timeline-container');
+      container.innerHTML = '';
+      const filtered = filter === 'all' ? data : data.filter(d => d.tag === filter);
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--muted)">No papers match this filter.</div>';
+        return;
+      }
+      filtered.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'timeline-item anim';
+        el.style.animationDelay = (index * 0.07) + 's';
+        const origIdx = data.indexOf(item);
+        const even = index % 2 === 0;
+        el.innerHTML = `
+          ${even ? `<div class="t-card" id="card-${origIdx}" onclick="showDetail(${origIdx})">
+            <div class="t-year-tag">${item.year}</div>
+            <div class="t-title">${item.title}</div>
+            <span class="t-tag ${tagColors[item.tag]}">${item.tag}</span>
+          </div>` : `<div class="t-spacer"></div>`}
+          <div class="timeline-dot-col">
+            <div class="timeline-dot" id="dot-${origIdx}" onclick="showDetail(${origIdx})" title="${item.year}"></div>
+          </div>
+          ${!even ? `<div class="t-card" id="card-${origIdx}" onclick="showDetail(${origIdx})">
+            <div class="t-year-tag">${item.year}</div>
+            <div class="t-title">${item.title}</div>
+            <span class="t-tag ${tagColors[item.tag]}">${item.tag}</span>
+          </div>` : `<div class="t-spacer"></div>`}
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function showDetail(idx) {
+      const item = data[idx];
+      currentPaper = idx;
+      document.getElementById('panelPlaceholder').style.display = 'none';
+      const content = document.getElementById('panelContent');
+      content.style.display = 'block';
+      document.getElementById('pYearTag').textContent = item.year + ' · ' + item.tag;
+      document.getElementById('pTitle').textContent = item.title;
+      document.getElementById('pDesc').textContent = item.description;
+      document.getElementById('pAuthors').textContent = item.authors;
+      document.querySelectorAll('.t-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.timeline-dot').forEach(d => d.classList.remove('active'));
+      const card = document.getElementById('card-' + idx);
+      const dot = document.getElementById('dot-' + idx);
+      if (card) card.classList.add('active');
+      if (dot) dot.classList.add('active');
+      const panel = document.getElementById('detailPanel');
+      panel.style.borderColor = 'rgba(88,166,255,0.4)';
+      setTimeout(() => panel.style.borderColor = '', 800);
+    }
+
+    function copyPaper() {
+      if (currentPaper === null) return;
+      const item = data[currentPaper];
+      const text = `${item.authors} (${item.year}). ${item.title}.`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('pCopy');
+        btn.textContent = 'Copied!'; btn.style.color = 'var(--emerald)';
+        setTimeout(() => { btn.textContent = 'Copy Citation'; btn.style.color = ''; }, 2000);
+      }).catch(() => {});
+    }
+
+    // Filters
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderTimeline(currentFilter);
+        // Auto-preview first matching paper in detail panel
+        const previewList = currentFilter === 'all' ? data : data.filter(d => d.tag === currentFilter);
+        if (previewList.length > 0) {
+          setTimeout(() => showDetail(data.indexOf(previewList[0])), 50);
+        }
+      });
+    });
+
+    // Search
+    function openSearch() {
+      document.getElementById('searchOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('searchInput').focus(), 50);
+    }
+    function closeSearch() { document.getElementById('searchOverlay').classList.remove('open'); document.getElementById('searchInput').value = ''; document.getElementById('searchResults').innerHTML = '<div class="search-empty">Start typing to search…</div>'; }
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      const res = document.getElementById('searchResults');
+      if (!q) { res.innerHTML = '<div class="search-empty">Start typing to search…</div>'; return; }
+      const matches = data.filter(d => d.title.toLowerCase().includes(q) || d.authors.toLowerCase().includes(q) || d.tag.toLowerCase().includes(q) || String(d.year).includes(q));
+      if (!matches.length) { res.innerHTML = '<div class="search-empty">No results found.</div>'; return; }
+      res.innerHTML = matches.map(d => {
+        const idx = data.indexOf(d);
+        return `<div class="search-result-item" onclick="closeSearch();showDetail(${idx})"><div class="sri-year">${d.year} · ${d.tag}</div><div class="sri-title">${d.title}</div></div>`;
+      }).join('');
+    });
+    document.getElementById('searchOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSearch(); });
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+      if (e.key === 'Escape') closeSearch();
+    });
+
+    // Progress bar
+    window.addEventListener('scroll', () => {
+      const s = document.documentElement.scrollTop;
+      const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('progress-bar').style.width = (s / h * 100) + '%';
+    });
+
+    // Init
+    renderTimeline('all');
+    setTimeout(() => showDetail(0), 100); // Show first paper by default
+    // ═══════════════════════════════════════════════════════
+    // TIMELINE QUIZ
+    // ═══════════════════════════════════════════════════════
+    const quizQuestions = [
+      {
+        paperIdx: 0,
+        q: "The 2015 Bahdanau paper introduced the attention mechanism for neural machine translation. What core problem did it solve?",
+        opts: { A:"It replaced the need for parallel corpora entirely", B:"It allowed the decoder to focus on relevant encoder positions at each output step instead of compressing everything into one fixed vector", C:"It introduced transformer-style positional encoding", D:"It eliminated the need for recurrent networks" },
+        ans: "B",
+        exp: "Before attention, encoder–decoder models compressed the entire source sentence into a single fixed-size context vector, losing information for long sentences. Bahdanau's attention lets the decoder dynamically attend to different source positions at each step."
+      },
+      {
+        paperIdx: 1,
+        q: "The 2017 'Attention Is All You Need' paper replaced RNNs and CNNs entirely. What mechanism did it use as its core building block?",
+        opts: { A:"Convolutional self-attention layers", B:"Bidirectional recurrent units with attention gates", C:"Multi-head self-attention across all positions simultaneously", D:"Capsule networks with dynamic routing" },
+        ans: "C",
+        exp: "The Transformer uses multi-head self-attention, allowing every position in the sequence to attend to every other position in parallel. This removes the sequential bottleneck of RNNs, enabling much faster training at scale."
+      },
+      {
+        paperIdx: 2,
+        q: "GPT-1 (2018) introduced the pretraining + fine-tuning paradigm. What was the pretraining objective?",
+        opts: { A:"Masked language modelling (predicting hidden tokens)", B:"Causal language modelling (predicting the next token left-to-right)", C:"Sentence-pair classification", D:"Contrastive self-supervised learning" },
+        ans: "B",
+        exp: "GPT-1 used autoregressive (causal) language modelling: given all previous tokens, predict the next one. This left-to-right objective teaches the model rich general language understanding, which is then transferred to downstream tasks with supervised fine-tuning."
+      },
+      {
+        paperIdx: 3,
+        q: "GPT-3 (2020) demonstrated 'few-shot learning'. What does this mean in context of LLMs?",
+        opts: { A:"The model was trained on only a few thousand examples", B:"The model adapts to a new task using only a few gradient update steps", C:"The model performs new tasks using only a handful of examples written in the prompt — no weight updates needed", D:"The model distills knowledge from a larger model using few examples" },
+        ans: "C",
+        exp: "Few-shot prompting means placing a few task demonstrations directly in the input text. GPT-3 performs the task without any gradient updates. This was revolutionary: a single 175B model could handle translation, arithmetic, code, and more by simply reading examples in context."
+      },
+      {
+        paperIdx: 4,
+        q: "InstructGPT (2022) used RLHF to improve GPT models. What does the 'RL' part actually optimise?",
+        opts: { A:"Cross-entropy loss on human-written demonstrations only", B:"A reward model trained on human preference rankings, optimised with PPO", C:"Direct backpropagation through human rater decisions", D:"A KL-divergence objective against the base GPT-3 logits" },
+        ans: "B",
+        exp: "RLHF has two stages: (1) train a reward model on human preference comparisons between model outputs, and (2) fine-tune the LLM using Proximal Policy Optimisation (PPO) to maximise reward while keeping a KL penalty to avoid drifting too far from the original SFT model."
+      },
+      {
+        paperIdx: 5,
+        q: "LoRA (2023) makes fine-tuning LLMs efficient. What is the mathematical trick it uses?",
+        opts: { A:"It prunes 90% of weights before training", B:"It quantises weights to 4-bit precision during backprop", C:"It decomposes weight updates into two small low-rank matrices, freezing the original weights", D:"It applies sparse attention to reduce gradient computation" },
+        ans: "C",
+        exp: "LoRA freezes the pretrained weight matrix W and instead learns two small matrices A (d×r) and B (r×k) where r ≪ d. The effective update is W + AB. With r=8 on a 7B model, you train ~0.1% of parameters — making fine-tuning feasible on a single GPU."
+      },
+      {
+        paperIdx: 6,
+        q: "Toolformer (2023) taught LLMs to use external APIs. How did it generate its own training data for this?",
+        opts: { A:"Human annotators manually labelled every API call in the training corpus", B:"It used GPT-4 to generate labelled tool-use examples via distillation", C:"It self-supervised by sampling candidate API calls and keeping only those that reduced perplexity on the surrounding text", D:"It used reinforcement learning with human reward for each correct API call" },
+        ans: "C",
+        exp: "Toolformer sampled candidate API call positions using few-shot prompting, executed the APIs, and retained only those calls where inserting the API result reduced the language modelling loss on the subsequent tokens. This self-supervised loop required no human annotation of tool use."
+      }
+    ];
+
+    let quizScore = 0;
+    let quizAnswers = [];
+    let quizStartTime = null;
+    let quizStreak = 0;
+    let quizMaxStreak = 0;
+
+    function startQuiz() {
+      const grid = document.getElementById('quizGrid');
+      const btn = document.getElementById('quizStartBtn');
+      grid.style.display = 'grid';
+      btn.textContent = 'In Progress…';
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      quizScore = 0; quizAnswers = []; quizStreak = 0; quizMaxStreak = 0;
+      quizStartTime = Date.now();
+      document.getElementById('scoreboard').classList.remove('visible');
+      grid.innerHTML = '';
+      quizQuestions.forEach((q, i) => {
+        const paper = data[q.paperIdx];
+        const card = document.createElement('div');
+        card.className = 'qcard';
+        card.id = 'qcard-' + i;
+        const optHtml = Object.entries(q.opts).map(([k,v]) =>
+          `<button class="qopt" onclick="answerQ(this,'${k}','${q.ans}',${i})"><span class="qopt-key">${k}</span><span>${v}</span></button>`
+        ).join('');
+        card.innerHTML = `
+          <div class="qcard-num">Q${i+1} of ${quizQuestions.length}</div>
+          <div class="qcard-year">${paper.year} · ${paper.tag}</div>
+          <div class="qcard-q">${q.q}</div>
+          <div class="qcard-opts">${optHtml}</div>
+          <div class="qfeedback" id="qfb-${i}"></div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function answerQ(btn, choice, ans, idx) {
+      const opts = btn.closest('.qcard-opts');
+      if (opts.dataset.done) return;
+      opts.dataset.done = '1';
+      [...opts.querySelectorAll('.qopt')].forEach(b => b.disabled = true);
+      const card = document.getElementById('qcard-' + idx);
+      const correct = choice === ans;
+      if (correct) {
+        btn.classList.add('correct');
+        quizScore++;
+        quizStreak++;
+        quizMaxStreak = Math.max(quizMaxStreak, quizStreak);
+        card.classList.add('answered-correct');
+      } else {
+        btn.classList.add('wrong');
+        opts.querySelectorAll('.qopt').forEach(b => {
+          if (b.querySelector('.qopt-key').textContent.trim() === ans) b.classList.add('correct');
+        });
+        quizStreak = 0;
+        card.classList.add('answered-wrong');
+      }
+      const fb = document.getElementById('qfb-' + idx);
+      const q = quizQuestions[idx];
+      fb.innerHTML = `<strong>${correct ? '✓ Correct!' : '✗ Incorrect.'}</strong> ${q.exp}`;
+      fb.style.display = 'block';
+      quizAnswers[idx] = correct;
+
+      // Check if all answered
+      const answered = document.querySelectorAll('.qcard-opts[data-done]').length;
+      if (answered === quizQuestions.length) showScoreboard();
+    }
+
+    function showScoreboard() {
+      const elapsed = Math.round((Date.now() - quizStartTime) / 1000);
+      const pct = Math.round(quizScore / quizQuestions.length * 100);
+      document.getElementById('sbScore').textContent = quizScore + '/' + quizQuestions.length;
+      document.getElementById('sbPct').textContent = pct + '%';
+      document.getElementById('sbTime').textContent = elapsed + 's';
+      document.getElementById('sbStreak').textContent = quizMaxStreak;
+      setTimeout(() => { document.getElementById('sbBar').style.width = pct + '%'; }, 100);
+      const verdict = document.getElementById('sbVerdict');
+      if (pct >= 70) {
+        verdict.innerHTML = '<span class="verdict pass">✓ Pass</span>';
+      } else {
+        verdict.innerHTML = '<span class="verdict fail">✗ Needs Review</span>';
+      }
+      const breakdown = document.getElementById('sbBreakdown');
+      breakdown.innerHTML = quizQuestions.map((q, i) => {
+        const paper = data[q.paperIdx];
+        const ok = quizAnswers[i];
+        return `<div class="sb-row">
+          <div class="sb-row-icon ${ok?'c':'w'}">${ok?'✓':'✗'}</div>
+          <div class="sb-row-paper">${paper.year} — ${paper.title.substring(0,50)}…</div>
+        </div>`;
+      }).join('');
+      const sb = document.getElementById('scoreboard');
+      sb.classList.add('visible');
+      document.getElementById('quizStartBtn').textContent = 'Quiz Complete';
+      setTimeout(() => sb.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+    }
+
+    function restartQuiz() {
+      document.getElementById('quizGrid').style.display = 'none';
+      document.getElementById('scoreboard').classList.remove('visible');
+      const btn = document.getElementById('quizStartBtn');
+      btn.textContent = 'Start Quiz';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
+
+  </script>
+</body>
+</html>

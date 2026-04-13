@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EM Waves — Advanced Guide · Saral Labs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'],['\\(','\\)']],
+        displayMath: [['$$','$$'],['\\[','\\]']],
+        tags: 'ams',
+        macros: {
+          vec: ['\\mathbf{#1}',1]
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { ready() { MathJax.startup.defaultReady(); } }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #1c2128; --surface3: #21262d;
+      --border: rgba(255,255,255,0.08); --divider: rgba(255,255,255,0.05);
+      --text: #e6edf3; --muted: #8b949e; --faint: #484f58;
+      --blue: #58a6ff; --emerald: #3fb950; --purple: #a371f7; --orange: #ffa657;
+      --font-d: 'Space Grotesk', sans-serif;
+      --font-b: 'Inter', sans-serif;
+      --font-m: 'JetBrains Mono', monospace;
+      --r-sm: 0.375rem; --r-md: 0.5rem; --r-lg: 0.75rem; --r-xl: 1rem; --r-2xl: 1.5rem;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-b); font-size: 1rem; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    img, svg { display: block; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+
+    /* ── PROGRESS BAR ──────────────────────────────── */
+    #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(to right, var(--purple), var(--blue)); width: 0; z-index: 200; transition: width 0.1s; }
+
+    /* ── NAVBAR ────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(1rem, 4vw, 2.5rem); height: 60px;
+      background: rgba(13,17,23,0.88); backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 0.625rem; font-family: var(--font-d); font-weight: 700; font-size: 1.05rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+    .nav-link { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.75rem; border-radius: var(--r-md); font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); transition: color 180ms var(--ease), background 180ms var(--ease); }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .nav-link.active { color: var(--purple); background: rgba(163,113,247,0.1); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    #score-display { font-family: var(--font-m); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.875rem; border-radius: 999px; background: rgba(163,113,247,0.1); border: 1px solid rgba(163,113,247,0.25); color: var(--purple); white-space: nowrap; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; padding: 0.5rem; }
+    .hamburger span { display: block; width: 20px; height: 2px; background: var(--muted); border-radius: 2px; }
+
+    /* ── PAGE LAYOUT ───────────────────────────────── */
+    .page-layout { display: grid; grid-template-columns: 1fr; max-width: 1140px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+    @media (min-width: 1024px) { .page-layout { grid-template-columns: 230px 1fr; gap: 3.5rem; } }
+
+    /* ── TOC ───────────────────────────────────────── */
+    .toc { display: none; }
+    @media (min-width: 1024px) {
+      .toc { display: block; position: sticky; top: 5.5rem; height: fit-content; padding-top: clamp(4rem,8vw,7rem); }
+    }
+    .toc-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--faint); font-weight: 700; margin-bottom: 0.875rem; }
+    .toc-list { list-style: none; }
+    .toc-item a { display: block; padding: 0.3rem 0.875rem; border-left: 2px solid var(--divider); font-size: 0.8rem; color: var(--muted); transition: color 150ms, border-color 150ms; line-height: 1.45; }
+    .toc-item a:hover, .toc-item a.active { color: var(--purple); border-color: var(--purple); }
+    .toc-sub a { padding-left: 1.5rem; font-size: 0.75rem; opacity: 0.8; }
+
+    /* ── HERO ──────────────────────────────────────── */
+    .hero { padding: clamp(5rem,10vw,8rem) 0 clamp(2rem,4vw,3rem); }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 1rem; border-radius: 999px; background: rgba(163,113,247,0.1); border: 1px solid rgba(163,113,247,0.25); font-size: 0.75rem; font-weight: 700; color: var(--purple); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .hero h1 { font-family: var(--font-d); font-size: clamp(2rem,5vw,3.75rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 1rem; }
+    .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--purple), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.8125rem; color: var(--muted); }
+    .hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+    /* ── CONTENT ───────────────────────────────────── */
+    .content { padding-top: clamp(4rem,8vw,6rem); }
+    .content h2 {
+      font-family: var(--font-d); font-size: clamp(1.35rem, 2.5vw, 1.7rem); font-weight: 700;
+      color: var(--purple); margin-top: clamp(3rem, 6vw, 4.5rem); margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem; border-bottom: 1px solid rgba(163,113,247,0.15); line-height: 1.3;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .content h2 .sec-num { font-family: var(--font-m); font-size: 0.75rem; font-weight: 500; color: rgba(163,113,247,0.5); letter-spacing: 0.05em; flex-shrink: 0; }
+    .content h3 { font-family: var(--font-d); font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 600; color: var(--text); margin-top: 2rem; margin-bottom: 0.875rem; line-height: 1.35; }
+    .content p { font-size: clamp(0.9rem, 1.5vw, 1rem); color: #adbac7; line-height: 1.85; margin-bottom: 1.25rem; max-width: 74ch; }
+    .content ul, .content ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .content li { font-size: clamp(0.9rem, 1.5vw, 1rem); color: #adbac7; line-height: 1.8; margin-bottom: 0.4rem; }
+    .content strong { color: var(--text); font-weight: 600; }
+    .content em { color: var(--orange); font-style: normal; font-weight: 500; }
+
+    /* ── EQUATION BLOCK ────────────────────────────── */
+    .eq-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid rgba(163,113,247,0.4);
+      border-radius: 0 var(--r-lg) var(--r-lg) 0;
+      padding: 1.5rem 1.75rem; margin: 1.5rem 0;
+      overflow-x: auto; position: relative;
+    }
+    .eq-block .eq-tag { position: absolute; top: 50%; right: 1rem; transform: translateY(-50%); font-family: var(--font-m); font-size: 0.75rem; color: var(--faint); }
+    .eq-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(163,113,247,0.6); font-weight: 700; font-family: var(--font-m); margin-bottom: 0.75rem; }
+
+    /* ── CALLOUT BOXES ─────────────────────────────── */
+    .callout {
+      display: flex; gap: 1rem; border-radius: var(--r-lg); padding: 1.25rem 1.5rem; margin: 1.5rem 0;
+    }
+    .callout-note { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.18); }
+    .callout-warn { background: rgba(255,166,87,0.06); border: 1px solid rgba(255,166,87,0.18); }
+    .callout-key  { background: rgba(163,113,247,0.06); border: 1px solid rgba(163,113,247,0.18); }
+    .callout-proof{ background: rgba(63,185,80,0.06);  border: 1px solid rgba(63,185,80,0.18); }
+    .callout-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .callout-body { font-size: 0.9rem; color: #adbac7; line-height: 1.7; }
+    .callout-body strong { color: var(--text); }
+    .callout-note .callout-body strong { color: var(--blue); }
+    .callout-warn .callout-body strong { color: var(--orange); }
+    .callout-key  .callout-body strong { color: var(--purple); }
+    .callout-proof .callout-body strong { color: var(--emerald); }
+
+    /* ── MAXWELL EQUATIONS CARD ────────────────────── */
+    .maxwell-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
+      gap: 1rem; margin: 2rem 0;
+    }
+    .maxwell-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 200ms var(--ease), transform 200ms var(--ease);
+    }
+    .maxwell-card:hover { border-color: rgba(163,113,247,0.3); transform: translateY(-2px); }
+    .mc-num { font-family: var(--font-m); font-size: 0.7rem; font-weight: 600; color: var(--purple); letter-spacing: 0.06em; margin-bottom: 0.5rem; text-transform: uppercase; }
+    .mc-name { font-family: var(--font-d); font-size: 0.875rem; font-weight: 700; color: var(--text); margin-bottom: 0.75rem; }
+    .mc-meaning { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── DERIVATION STEPS ──────────────────────────── */
+    .derivation { counter-reset: step; margin: 1.5rem 0; }
+    .step {
+      position: relative; padding: 1.25rem 1.5rem 1.25rem 3.5rem;
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg);
+      margin-bottom: 0.75rem; counter-increment: step;
+    }
+    .step::before {
+      content: counter(step);
+      position: absolute; left: 1rem; top: 1.25rem;
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      background: rgba(163,113,247,0.12); border: 1px solid rgba(163,113,247,0.25);
+      border-radius: 50%; font-family: var(--font-m); font-size: 0.8rem; font-weight: 700; color: var(--purple);
+    }
+    .step-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text); }
+    .step p { font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--muted); max-width: none; }
+
+    /* ── ASSUMPTION BOX ────────────────────────────── */
+    .assumption {
+      display: flex; gap: 0.75rem; align-items: flex-start;
+      background: rgba(255,166,87,0.04); border: 1px solid rgba(255,166,87,0.12);
+      border-radius: var(--r-md); padding: 0.875rem 1.25rem; margin: 0.875rem 0; font-size: 0.875rem;
+    }
+    .assumption .tag { font-family: var(--font-m); font-size: 0.7rem; font-weight: 700; color: var(--orange); letter-spacing: 0.06em; white-space: nowrap; margin-top: 0.15rem; }
+    .assumption .text { color: var(--muted); line-height: 1.6; }
+
+    /* ── SPECTRUM TABLE ────────────────────────────── */
+    .spectrum-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.875rem; border-radius: var(--r-lg); overflow: hidden; }
+    .spectrum-table th { background: var(--surface3); color: var(--muted); text-align: left; padding: 0.75rem 1rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+    .spectrum-table td { padding: 0.75rem 1rem; border-top: 1px solid var(--divider); vertical-align: middle; line-height: 1.5; }
+    .spectrum-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .sband { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .band-radio   { background: rgba(88,166,255,0.12); color: var(--blue); }
+    .band-micro   { background: rgba(255,166,87,0.12); color: var(--orange); }
+    .band-ir      { background: rgba(255,100,80,0.12); color: #ff8f7e; }
+    .band-vis     { background: linear-gradient(to right,rgba(88,166,255,0.15),rgba(63,185,80,0.15),rgba(255,166,87,0.15)); color: var(--text); border: 1px solid rgba(255,255,255,0.1); }
+    .band-uv      { background: rgba(163,113,247,0.12); color: var(--purple); }
+    .band-xray    { background: rgba(163,113,247,0.2); color: #c4a0ff; }
+    .band-gamma   { background: rgba(255,60,60,0.12); color: #ff8080; }
+
+    /* ── QUIZ ──────────────────────────────────────── */
+    .quiz-section { margin-top: clamp(3rem,6vw,5rem); padding-top: 2.5rem; border-top: 1px solid var(--divider); }
+    .quiz-section > h2 { margin-top: 0; border-bottom-color: rgba(163,113,247,0.15); }
+    .quiz-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    @media (min-width: 768px) { .quiz-grid { grid-template-columns: 1fr 1fr; } }
+    .quiz-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl); padding: 1.75rem; }
+    .quiz-num { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--faint); font-weight: 700; margin-bottom: 0.875rem; }
+    .quiz-question { font-family: var(--font-d); font-size: 0.95rem; font-weight: 600; line-height: 1.5; margin-bottom: 1.25rem; color: var(--text); }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-btn { text-align: left; padding: 0.75rem 1rem; border-radius: var(--r-md); background: var(--surface2); border: 1px solid var(--border); font-size: 0.875rem; line-height: 1.5; color: var(--muted); transition: background 150ms, border-color 150ms, color 150ms; }
+    .quiz-btn:hover:not([disabled]) { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.18); color: var(--text); }
+    .quiz-btn .opt-key { font-weight: 700; color: var(--purple); margin-right: 0.75rem; font-family: var(--font-m); font-size: 0.8rem; }
+    .quiz-btn.correct { background: rgba(63,185,80,0.1); border-color: var(--emerald); color: var(--text); }
+    .quiz-btn.wrong   { background: rgba(255,80,80,0.08); border-color: rgba(255,80,80,0.35); }
+    .quiz-feedback { display: none; margin-top: 1rem; padding: 1rem 1.25rem; background: rgba(163,113,247,0.06); border: 1px solid rgba(163,113,247,0.18); border-radius: var(--r-md); font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .quiz-feedback strong { color: var(--text); }
+
+    /* ── BACK TO TOP ───────────────────────────────── */
+    #back-to-top { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--surface); border: 1px solid var(--border); border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 200ms, transform 200ms; }
+    #back-to-top.visible { opacity: 1; pointer-events: all; }
+    #back-to-top:hover { transform: translateY(-2px); border-color: rgba(163,113,247,0.4); }
+
+    /* ── ANIMATIONS ────────────────────────────────── */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    .reveal { opacity: 0; }
+    .reveal.in { animation: fadeInUp 0.5s var(--ease) forwards; }
+
+    /* ── MOBILE ────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; flex-direction: column; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem; gap: 0.25rem; }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+    }
+    @media (max-width: 767px) {
+      .maxwell-grid { grid-template-columns: 1fr; }
+      .spectrum-table { font-size: 0.8rem; }
+      .spectrum-table th, .spectrum-table td { padding: 0.6rem 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo" aria-label="Saral Labs home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <rect width="26" height="26" rx="6" fill="rgba(163,113,247,0.15)"/>
+        <path d="M7 13L11 17L19 9" stroke="#a371f7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Saral Labs</span>
+    </a>
+    <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="nav-link">Timeline</a>
+      <a href="easy.html" class="nav-link">Easy Guide</a>
+      <a href="hard.html" class="nav-link active">Advanced Guide</a>
+    </div>
+    <div class="nav-right">
+      <div id="score-display">Score: 0 / 5</div>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <aside class="toc" aria-label="Table of contents">
+      <p class="toc-title">Contents</p>
+      <ul class="toc-list" id="tocList"></ul>
+    </aside>
+
+    <div>
+      <header class="hero">
+        <div class="hero-badge">
+          <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+          Advanced Mode
+        </div>
+        <h1>Electromagnetic <em>Waves</em></h1>
+        <div class="hero-meta">
+          <span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Technical Deep-Dive
+          </span>
+          <span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            ~30 min read
+          </span>
+          <span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            5-question quiz
+          </span>
+        </div>
+      </header>
+
+      <main class="content" id="mainContent">
+
+        <h2 id="sec1">
+          <span class="sec-num">§ 1</span>
+          The Inconsistency in Ampère's Circuital Law
+        </h2>
+
+        <p>In classical magnetostatics, Ampère's Circuital Law relates the magnetic field around a closed loop to the net conduction current passing through any surface bounded by that loop. Before Maxwell's intervention, this law was stated as:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Ampère's Law (Original Form)</div>
+          \[\oint_C \mathbf{B} \cdot d\mathbf{l} = \mu_0 \, I_{\text{enclosed}}\]
+        </div>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body"><strong>The flaw:</strong> This law was derived under the assumption of <em>steady currents</em> only. For time-varying fields, it produces mathematically inconsistent results — as the capacitor paradox below demonstrates.</div>
+        </div>
+
+        <h3>The Charging Capacitor Paradox</h3>
+
+        <p>Consider a parallel-plate capacitor being charged by a time-dependent conduction current \( I(t) \). Apply Ampère's Law to a circular Amperian loop \( C \) centred on the wire, but choose two different surfaces both bounded by the same loop:</p>
+
+        <div class="assumption"><span class="tag">Assumption 1</span><span class="text">The wire is thin and the conduction current \(I(t)\) varies slowly enough that the quasi-static approximation holds, yet fast enough to observe charging effects.</span></div>
+        <div class="assumption"><span class="tag">Assumption 2</span><span class="text">The medium between the plates is vacuum (\(\kappa = 1\)), so fringe fields at the plate edges are negligible.</span></div>
+
+        <ul>
+          <li><strong>Surface \(S_1\):</strong> A flat disk spanning the loop. The wire pierces this surface, so the enclosed current is \(I_{\text{enclosed}} = I(t)\). By Ampère's Law:</li>
+        </ul>
+
+        <div class="eq-block">
+          \[\oint_C \mathbf{B} \cdot d\mathbf{l} = \mu_0 \, I(t)\]
+        </div>
+
+        <ul>
+          <li><strong>Surface \(S_2\):</strong> A balloon-shaped surface that bulges out and passes <em>between</em> the capacitor plates. No conduction current pierces this surface (\(I = 0\)):</li>
+        </ul>
+
+        <div class="eq-block">
+          \[\oint_C \mathbf{B} \cdot d\mathbf{l} = 0\]
+        </div>
+
+        <div class="callout callout-key">
+          <span class="callout-icon">🔑</span>
+          <div class="callout-body"><strong>The contradiction:</strong> The line integral of \(\mathbf{B}\) around a fixed loop must be <em>unique</em> — independent of which surface you choose to cap the loop. Getting \(\mu_0 I(t)\) vs. \(0\) for the same loop is a mathematical impossibility. This proves the original law is incomplete.</div>
+        </div>
+
+        <h2 id="sec2">
+          <span class="sec-num">§ 2</span>
+          Deriving the Displacement Current
+        </h2>
+
+        <p>Maxwell resolved the inconsistency by invoking <strong>Gauss's Law</strong> and the principle of charge conservation. Let \(Q(t)\) be the charge on the capacitor plates and \(A\) be the plate area.</p>
+
+        <div class="assumption"><span class="tag">Assumption 3</span><span class="text">The electric field \(\mathbf{E}\) is uniform between the plates and zero outside (neglecting edge effects). This is the parallel-plate approximation.</span></div>
+
+        <p>Gauss's Law gives the electric flux through \(S_2\):</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Gauss's Law — Electric Flux</div>
+          \[\Phi_E = \int_{S_2} \mathbf{E} \cdot d\mathbf{A} = \frac{Q(t)}{\epsilon_0}\]
+        </div>
+
+        <p>Differentiate with respect to time to find the rate of change of flux:</p>
+
+        <div class="eq-block">
+          \[\frac{d\Phi_E}{dt} = \frac{1}{\epsilon_0} \frac{dQ}{dt} = \frac{I_c}{\epsilon_0}\]
+        </div>
+
+        <p>Because \(\frac{dQ}{dt} = I_c\) (the conduction current charging the plates), we can rearrange this as:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Definition — Displacement Current</div>
+          \[I_d = \epsilon_0 \frac{d\Phi_E}{dt}\]
+        </div>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body"><strong>Physical meaning:</strong> \(I_d\) is <em>not</em> the flow of physical charges. It is the rate of change of electric flux — a purely field-theoretic quantity. Between the capacitor plates, \(I_d = I_c\) exactly, so "current" is conserved across any surface.</div>
+        </div>
+
+        <h3>Differential Form — Displacement Current Density</h3>
+
+        <p>In differential (point-by-point) form, the displacement current density is:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Displacement Current Density</div>
+          \[\mathbf{J}_d = \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}\]
+        </div>
+
+        <p>This emerges from the requirement that taking the divergence of the modified Ampère equation must be consistent with the continuity equation \(\nabla \cdot \mathbf{J} + \frac{\partial \rho}{\partial t} = 0\).</p>
+
+        <div class="callout callout-proof">
+          <span class="callout-icon">🔍</span>
+          <div class="callout-body"><strong>Divergence consistency check:</strong> Taking \(\nabla \cdot\) of \(\nabla \times \mathbf{B} = \mu_0 \mathbf{J}\), the left side is identically zero (divergence of curl). So \(\mu_0(\nabla \cdot \mathbf{J}) = 0\), implying \(\nabla \cdot \mathbf{J} = 0\). But continuity says \(\nabla \cdot \mathbf{J} = -\frac{\partial \rho}{\partial t}\), which is only zero for <em>steady</em> currents. Adding \(\mathbf{J}_d = \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}\) fixes this exactly, since Gauss's Law gives \(\nabla \cdot \mathbf{E} = \rho/\epsilon_0\).</div>
+        </div>
+
+        <h2 id="sec3">
+          <span class="sec-num">§ 3</span>
+          The Ampère-Maxwell Law
+        </h2>
+
+        <p>Adding the displacement current to the original Ampère Law gives the <strong>Ampère-Maxwell Law</strong> — the fourth of Maxwell's equations:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Ampère-Maxwell Law (Integral Form)</div>
+          \[\oint_C \mathbf{B} \cdot d\mathbf{l} = \mu_0 (I_c + I_d) = \mu_0 I_c + \mu_0 \epsilon_0 \frac{d\Phi_E}{dt}\]
+        </div>
+
+        <div class="eq-block">
+          <div class="eq-label">Ampère-Maxwell Law (Differential Form)</div>
+          \[\nabla \times \mathbf{B} = \mu_0 \mathbf{J}_c + \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}\]
+        </div>
+
+        <h2 id="sec4">
+          <span class="sec-num">§ 4</span>
+          Maxwell's Four Equations — Complete Set
+        </h2>
+
+        <p>Together, these four equations govern all classical electromagnetic phenomena. In a vacuum with no free charges or currents (\(\rho = 0, \, \mathbf{J} = 0\)), they become the foundation for deriving electromagnetic waves:</p>
+
+        <div class="maxwell-grid">
+          <div class="maxwell-card">
+            <div class="mc-num">Maxwell I — Gauss's Law</div>
+            <div class="mc-name">Electric Flux</div>
+            <div class="eq-block" style="margin:0.75rem 0;">\[\nabla \cdot \mathbf{E} = \frac{\rho}{\epsilon_0}\]</div>
+            <div class="mc-meaning">Electric field lines originate on positive charges and terminate on negative charges. In vacuum: \(\nabla \cdot \mathbf{E} = 0\).</div>
+          </div>
+          <div class="maxwell-card">
+            <div class="mc-num">Maxwell II — Gauss's Law for Magnetism</div>
+            <div class="mc-name">No Magnetic Monopoles</div>
+            <div class="eq-block" style="margin:0.75rem 0;">\[\nabla \cdot \mathbf{B} = 0\]</div>
+            <div class="mc-meaning">Magnetic field lines always form closed loops. There are no isolated magnetic charges (monopoles) in nature.</div>
+          </div>
+          <div class="maxwell-card">
+            <div class="mc-num">Maxwell III — Faraday's Law</div>
+            <div class="mc-name">Electromagnetic Induction</div>
+            <div class="eq-block" style="margin:0.75rem 0;">\[\nabla \times \mathbf{E} = -\frac{\partial \mathbf{B}}{\partial t}\]</div>
+            <div class="mc-meaning">A time-varying magnetic field induces a circulating electric field. This is the principle behind generators and transformers.</div>
+          </div>
+          <div class="maxwell-card">
+            <div class="mc-num">Maxwell IV — Ampère-Maxwell Law</div>
+            <div class="mc-name">Magnetic Circulation</div>
+            <div class="eq-block" style="margin:0.75rem 0;">\[\nabla \times \mathbf{B} = \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}\]</div>
+            <div class="mc-meaning">A time-varying electric field induces a circulating magnetic field — Maxwell's key addition, enabling wave propagation in vacuum.</div>
+          </div>
+        </div>
+
+        <h2 id="sec5">
+          <span class="sec-num">§ 5</span>
+          Derivation of the EM Wave Equation
+        </h2>
+
+        <p>Starting from Maxwell's equations in a source-free vacuum (\(\rho = 0, \mathbf{J} = 0\)), we derive the wave equation for the electric field. The derivation uses the <em>curl of the curl</em> technique:</p>
+
+        <div class="derivation">
+          <div class="step">
+            <div class="step-title">Take the curl of Faraday's Law (Maxwell III)</div>
+            <p>Apply \(\nabla \times\) to both sides:</p>
+            <div class="eq-block" style="margin:0.5rem 0;">\[\nabla \times (\nabla \times \mathbf{E}) = -\frac{\partial}{\partial t}(\nabla \times \mathbf{B})\]</div>
+          </div>
+          <div class="step">
+            <div class="step-title">Apply the vector identity</div>
+            <p>Use \(\nabla \times (\nabla \times \mathbf{A}) = \nabla(\nabla \cdot \mathbf{A}) - \nabla^2 \mathbf{A}\) on the left side:</p>
+            <div class="eq-block" style="margin:0.5rem 0;">\[\nabla(\nabla \cdot \mathbf{E}) - \nabla^2 \mathbf{E} = -\frac{\partial}{\partial t}(\nabla \times \mathbf{B})\]</div>
+          </div>
+          <div class="step">
+            <div class="step-title">Substitute Maxwell I and Maxwell IV</div>
+            <p>Since \(\nabla \cdot \mathbf{E} = 0\) (no free charges), and \(\nabla \times \mathbf{B} = \mu_0 \epsilon_0 \frac{\partial \mathbf{E}}{\partial t}\):</p>
+            <div class="eq-block" style="margin:0.5rem 0;">\[0 - \nabla^2 \mathbf{E} = -\mu_0 \epsilon_0 \frac{\partial^2 \mathbf{E}}{\partial t^2}\]</div>
+          </div>
+          <div class="step">
+            <div class="step-title">Arrive at the 3D Wave Equation</div>
+            <p>Rearranging gives the final electromagnetic wave equation:</p>
+            <div class="eq-block" style="margin:0.5rem 0; border-left-color: rgba(163,113,247,0.8);">\[\nabla^2 \mathbf{E} = \mu_0 \epsilon_0 \frac{\partial^2 \mathbf{E}}{\partial t^2}\]</div>
+          </div>
+        </div>
+
+        <p>Comparing with the standard wave equation \(\nabla^2 f = \frac{1}{v^2}\frac{\partial^2 f}{\partial t^2}\), the phase velocity is:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Speed of Light from First Principles</div>
+          \[c = \frac{1}{\sqrt{\mu_0 \epsilon_0}} \approx 3 \times 10^8 \; \text{m/s}\]
+        </div>
+
+        <div class="callout callout-key">
+          <span class="callout-icon">⚡</span>
+          <div class="callout-body"><strong>Maxwell's greatest insight:</strong> This speed exactly matched the experimentally measured speed of light. Maxwell immediately concluded that <em>light itself is an electromagnetic wave</em> — unifying optics with electromagnetism in a single stroke.</div>
+        </div>
+
+        <h2 id="sec6">
+          <span class="sec-num">§ 6</span>
+          Plane Wave Solutions and Field Orthogonality
+        </h2>
+
+        <p>For a monochromatic plane wave propagating in the \(+x\) direction, the electric field is polarized along \(\hat{j}\):</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Electric Field of a Plane Wave</div>
+          \[\mathbf{E}(x,t) = E_0 \sin(kx - \omega t)\,\hat{j}\]
+        </div>
+
+        <div class="assumption"><span class="tag">Assumption 4</span><span class="text">The wave is a transverse electromagnetic (TEM) wave. Both \(\mathbf{E}\) and \(\mathbf{B}\) are perpendicular to the direction of propagation.</span></div>
+
+        <p>Applying Faraday's Law (\(\nabla \times \mathbf{E} = -\partial \mathbf{B}/\partial t\)) to find the corresponding magnetic field — the curl of \(\mathbf{E}\) for this geometry reduces to:</p>
+
+        <div class="eq-block">
+          \[\nabla \times \mathbf{E} = \frac{\partial E_y}{\partial x}\hat{k} = k E_0 \cos(kx - \omega t)\,\hat{k}\]
+        </div>
+
+        <p>Integrating \(-\partial B_z/\partial t = k E_0 \cos(kx-\omega t)\) with respect to time:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Magnetic Field of a Plane Wave</div>
+          \[\mathbf{B}(x,t) = \frac{k}{\omega} E_0 \sin(kx - \omega t)\,\hat{k} = \frac{E_0}{c}\sin(kx-\omega t)\,\hat{k}\]
+        </div>
+
+        <p>Since the wave speed \(c = \omega/k\), we get \(B_0 = E_0/c\). This yields the fundamental ratio:</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Amplitude Ratio</div>
+          \[\frac{E_0}{B_0} = c = 3 \times 10^8 \;\text{m/s}\]
+        </div>
+
+        <div class="callout callout-note">
+          <span class="callout-icon">📌</span>
+          <div class="callout-body"><strong>Orthogonality:</strong> \(\mathbf{E}\) and \(\mathbf{B}\) are in phase, perpendicular to each other, and perpendicular to the propagation direction \(\hat{x}\). The energy is shared equally between both fields despite the magnitude difference by factor \(c\) (an SI units artefact).</div>
+        </div>
+
+        <h2 id="sec7">
+          <span class="sec-num">§ 7</span>
+          The Electromagnetic Spectrum
+        </h2>
+
+        <p>All electromagnetic waves obey the same wave equation and travel at \(c\) in vacuum. The only parameter distinguishing different types is the frequency \(f\) (or equivalently, the wavelength \(\lambda = c/f\) or angular wavenumber \(k = 2\pi/\lambda\)).</p>
+
+        <div class="eq-block">
+          <div class="eq-label">Dispersion Relation (Vacuum)</div>
+          \[\omega = ck \qquad \Longleftrightarrow \qquad f = \frac{c}{\lambda}\]
+        </div>
+
+        <table class="spectrum-table" role="table" aria-label="Electromagnetic spectrum bands">
+          <thead>
+            <tr>
+              <th>Band</th>
+              <th>Frequency</th>
+              <th>Wavelength</th>
+              <th>Key Application</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sband band-radio">Radio</span></td>
+              <td>&lt; 300 MHz</td>
+              <td>&gt; 1 m</td>
+              <td>AM/FM broadcast, radar</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-micro">Microwave</span></td>
+              <td>300 MHz – 300 GHz</td>
+              <td>1 mm – 1 m</td>
+              <td>WiFi, 5G, ovens, satellite</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-ir">Infrared</span></td>
+              <td>300 GHz – 430 THz</td>
+              <td>700 nm – 1 mm</td>
+              <td>Thermal imaging, remote controls</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-vis">Visible Light</span></td>
+              <td>430 – 750 THz</td>
+              <td>400 – 700 nm</td>
+              <td>Human vision, optical fibre</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-uv">Ultraviolet</span></td>
+              <td>750 THz – 30 PHz</td>
+              <td>10 – 400 nm</td>
+              <td>Sterilisation, fluorescence</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-xray">X-ray</span></td>
+              <td>30 PHz – 30 EHz</td>
+              <td>0.01 – 10 nm</td>
+              <td>Medical imaging, crystallography</td>
+            </tr>
+            <tr>
+              <td><span class="sband band-gamma">Gamma Ray</span></td>
+              <td>&gt; 30 EHz</td>
+              <td>&lt; 0.01 nm</td>
+              <td>Cancer treatment, nuclear physics</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body"><strong>Common misconception:</strong> The boundaries between bands are conventional, not physical. There is no sharp "edge" where radio waves end and microwaves begin — the spectrum is continuous. The classification exists purely for engineering and application purposes.</div>
+        </div>
+
+        <section class="quiz-section" aria-label="Knowledge check">
+          <h2 id="quiz-heading">
+            <span class="sec-num">§ Q</span>
+            Check Your Progress
+          </h2>
+          <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0;">Five rigorous questions drawn from the derivations above.</p>
+          <div class="quiz-grid" id="quiz"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg>
+  </button>
+
+  <script>
+    // ── PROGRESS BAR + BACK TO TOP
+    window.addEventListener('scroll', () => {
+      const s = document.documentElement.scrollTop;
+      const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      document.getElementById('progress-bar').style.width = (s/h*100)+'%';
+      const btt = document.getElementById('back-to-top');
+      s > 400 ? btt.classList.add('visible') : btt.classList.remove('visible');
+    });
+
+    // ── TOC GENERATION
+    const headings = document.querySelectorAll('.content h2');
+    const tocList  = document.getElementById('tocList');
+    headings.forEach(h => {
+      if (!h.id || h.id === 'quiz-heading') return;
+      const li = document.createElement('li');
+      li.className = 'toc-item';
+      const text = h.textContent.replace(/§\s*\S+\s*/, '').trim();
+      li.innerHTML = `<a href="#${h.id}">${text}</a>`;
+      tocList.appendChild(li);
+    });
+
+    // ── ACTIVE TOC ON SCROLL
+    const tocObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.toc-item a').forEach(a => a.classList.remove('active'));
+          const active = document.querySelector(`.toc-item a[href="#${e.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-60px 0px -65% 0px' });
+    headings.forEach(h => { if (h.id) tocObs.observe(h); });
+
+    // ── SCROLL REVEAL
+    const revealObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObs.unobserve(e.target); } });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.content h2, .content h3, .content p, .callout, .eq-block, .maxwell-card, .step, .quiz-card').forEach(el => {
+      el.classList.add('reveal'); revealObs.observe(el);
+    });
+
+    // ── QUIZ
+    const questions = [
+      {
+        q: "When the original Ampère's Law \\(\\oint_C \\mathbf{B}\\cdot d\\mathbf{l} = \\mu_0 I_{\\text{enc}}\\) is applied to the balloon-shaped surface \\(S_2\\) in the capacitor paradox, what value does the integral yield and why is this problematic?",
+        opts: {
+          A: "It equals \\(\\mu_0 I(t)\\) because the electric field carries an effective current.",
+          B: "It equals zero because no conduction current pierces \\(S_2\\), contradicting the non-zero result from surface \\(S_1\\).",
+          C: "It is undefined because \\(\\mathbf{B}\\) cannot exist in a region with a changing electric field.",
+          D: "It equals \\(-d\\Phi_B/dt\\) according to Faraday's Law."
+        },
+        ans: "B",
+        exp: "For surface \\(S_1\\) (flat disk), the wire pierces the surface giving \\(I_{\\text{enc}} = I(t)\\). For \\(S_2\\) (balloon through the gap), no charges cross the vacuum gap, so \\(I_{\\text{enc}} = 0\\). Since both surfaces share the same boundary loop \\(C\\), the left-hand side must be identical — yielding \\(\\mu_0 I(t)\\) vs. \\(0\\) is a direct mathematical contradiction."
+      },
+      {
+        q: "Maxwell defined the displacement current as \\(I_d = \\epsilon_0 \\frac{d\\Phi_E}{dt}\\). Which of the following is the most precise physical interpretation of this quantity?",
+        opts: {
+          A: "It is a real flow of electrons across the capacitor gap at high frequencies.",
+          B: "It is the rate at which the electric field strength decreases between the plates.",
+          C: "It is a rate of change of electric flux that sources a magnetic field identically to conduction current, with no physical charge motion required.",
+          D: "It equals the conduction current divided by the dielectric constant of the medium."
+        },
+        ans: "C",
+        exp: "\\(I_d\\) is purely a field-theoretic quantity — there are no charges moving in the gap. Yet Maxwell showed it produces a magnetic field exactly equivalent to a conduction current of the same magnitude. Between the plates of a charging capacitor, \\(I_d = I_c\\) exactly, restoring current continuity."
+      },
+      {
+        q: "In the derivation of the EM wave equation, the vector identity \\(\\nabla\\times(\\nabla\\times\\mathbf{E}) = \\nabla(\\nabla\\cdot\\mathbf{E}) - \\nabla^2\\mathbf{E}\\) is applied. In a source-free vacuum, why does the first term on the right vanish?",
+        opts: {
+          A: "Because \\(\\mathbf{E}\\) is a conservative field and its curl is zero.",
+          B: "Because Gauss's Law with \\(\\rho = 0\\) gives \\(\\nabla\\cdot\\mathbf{E} = 0\\).",
+          C: "Because the displacement current cancels the divergence term.",
+          D: "Because the magnetic field is perpendicular to the electric field."
+        },
+        ans: "B",
+        exp: "In source-free vacuum, Maxwell I (Gauss's Law) reads \\(\\nabla\\cdot\\mathbf{E} = \\rho/\\epsilon_0 = 0\\). Therefore \\(\\nabla(\\nabla\\cdot\\mathbf{E}) = \\nabla(0) = 0\\), eliminating the first term and leaving the clean wave equation \\(\\nabla^2\\mathbf{E} = \\mu_0\\epsilon_0 \\,\\partial^2\\mathbf{E}/\\partial t^2\\)."
+      },
+      {
+        q: "For a plane EM wave with electric field \\(\\mathbf{E} = E_0\\sin(kx-\\omega t)\\hat{j}\\), the magnetic field is \\(\\mathbf{B} = (E_0/c)\\sin(kx-\\omega t)\\hat{k}\\). What does this tell us about the phase and polarisation relationship?",
+        opts: {
+          A: "\\(\\mathbf{E}\\) and \\(\\mathbf{B}\\) are in phase and mutually perpendicular, both perpendicular to the propagation direction.",
+          B: "\\(\\mathbf{B}\\) lags \\(\\mathbf{E}\\) by 90° because energy must transfer between the fields.",
+          C: "\\(\\mathbf{E}\\) and \\(\\mathbf{B}\\) are parallel, meaning the wave has longitudinal polarisation.",
+          D: "\\(\\mathbf{B}\\) is always stronger than \\(\\mathbf{E}\\) by a factor of \\(c\\)."
+        },
+        ans: "A",
+        exp: "Both fields share the same \\(\\sin(kx-\\omega t)\\) dependence — they are in phase. \\(\\mathbf{E}\\) points along \\(\\hat{j}\\), \\(\\mathbf{B}\\) along \\(\\hat{k}\\), and the wave travels along \\(\\hat{i}\\): three mutually perpendicular directions. While \\(B_0 = E_0/c\\) means the magnetic amplitude is much smaller in SI units, both fields carry equal energy per unit volume."
+      },
+      {
+        q: "Which pair of values correctly identifies a microwave communication signal at 5 GHz and its corresponding free-space wavelength?",
+        opts: {
+          A: "\\(f = 5\\times10^9\\) Hz, \\(\\lambda = 6\\) cm",
+          B: "\\(f = 5\\times10^9\\) Hz, \\(\\lambda = 6\\) mm",
+          C: "\\(f = 5\\times10^{12}\\) Hz, \\(\\lambda = 60\\) μm",
+          D: "\\(f = 5\\times10^9\\) Hz, \\(\\lambda = 6\\) m"
+        },
+        ans: "A",
+        exp: "Using \\(\\lambda = c/f\\): \\(\\lambda = (3\\times10^8\\text{ m/s}) / (5\\times10^9\\text{ Hz}) = 0.06\\text{ m} = 6\\text{ cm}\\). This falls squarely in the microwave band (1 mm – 1 m), consistent with WiFi and 5G frequencies."
+      }
+    ];
+
+    let score = 0;
+    const quizEl = document.getElementById('quiz');
+    questions.forEach((q, i) => {
+      const card = document.createElement('div');
+      card.className = 'quiz-card';
+      const optHtml = Object.entries(q.opts).map(([k,v]) =>
+        `<button class="quiz-btn" onclick="checkAnswer(this,'${k}','${q.ans}',${i})"><span class="opt-key">${k}</span>${v}</button>`
+      ).join('');
+      card.innerHTML = `
+        <p class="quiz-num">Question ${i+1} / ${questions.length}</p>
+        <h4 class="quiz-question">${q.q}</h4>
+        <div class="quiz-options">${optHtml}</div>
+        <div class="quiz-feedback" id="fb-${i}"><strong>Explanation:</strong> ${q.exp}</div>
+      `;
+      quizEl.appendChild(card);
+    });
+
+    // Typeset quiz after DOM insert
+    if (window.MathJax) MathJax.startup.promise.then(() => MathJax.typesetPromise([quizEl]));
+
+    function checkAnswer(btn, choice, ans, idx) {
+      const opts = btn.closest('.quiz-options');
+      if (opts.dataset.done) return;
+      opts.dataset.done = '1';
+      [...opts.querySelectorAll('.quiz-btn')].forEach(b => b.disabled = true);
+      if (choice === ans) {
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score-display').textContent = 'Score: ' + score + ' / 5';
+      } else {
+        btn.classList.add('wrong');
+        opts.querySelectorAll('.quiz-btn').forEach(b => {
+          if (b.querySelector('.opt-key').textContent.trim() === ans) b.classList.add('correct');
+        });
+      }
+      const fb = document.getElementById('fb-' + idx);
+      fb.style.display = 'block';
+      
+      // Chaining the promise here for stability
+      if (window.MathJax) {
+        MathJax.startup.promise = MathJax.startup.promise
+          .then(() => MathJax.typesetPromise([fb]))
+          .catch((err) => console.error('MathJax error:', err));
+      }
+    }
+  </script>
+</body>
+</html>
